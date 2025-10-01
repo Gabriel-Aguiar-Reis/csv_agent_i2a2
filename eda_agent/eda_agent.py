@@ -19,7 +19,6 @@ class EDAAgent:
         if self.df is None:
             return "Nenhum dado carregado.", None
         analysis = analyze_data(self.df)
-        print("API Key being used:", self.api_key)  # Debug line to check API key
         llm_response = query_llm(question, analysis, api_key=self.api_key)
         fig = None
         # Lógica de tooling: verifica se o LLM pediu gráfico
