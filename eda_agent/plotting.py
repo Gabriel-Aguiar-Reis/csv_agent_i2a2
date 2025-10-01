@@ -37,8 +37,11 @@ def generate_graph(df: pd.DataFrame, question: str, tool_type: str = "histogram"
                 return fig
         case "heatmap":
             corr = df.corr(numeric_only=True)
-            fig, ax = plt.subplots(figsize=(max(8, 0.5 * len(corr)), max(6, 0.5 * len(corr))))
-            # Heatmap sem valores numéricos (apenas cores)
+            # Heatmap maior para melhor visualização
+            n = len(corr)
+            fig_width = max(12, 0.7 * n)
+            fig_height = max(10, 0.7 * n)
+            fig, ax = plt.subplots(figsize=(fig_width, fig_height))
             sns.heatmap(
                 corr,
                 annot=False,
@@ -51,8 +54,8 @@ def generate_graph(df: pd.DataFrame, question: str, tool_type: str = "histogram"
                 yticklabels=True
             )
             # Ajusta os rótulos para evitar sobreposição
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=8)
-            ax.set_yticklabels(ax.get_yticklabels(), rotation=0, fontsize=8)
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=10)
+            ax.set_yticklabels(ax.get_yticklabels(), rotation=0, fontsize=10)
             fig.tight_layout()
             ax.set_title("Heatmap de Correlação (cores apenas, sem valores)")
             return fig
