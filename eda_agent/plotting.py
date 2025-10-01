@@ -36,27 +36,26 @@ def generate_graph(df: pd.DataFrame, question: str, tool_type: str = "histogram"
                 ax.set_title(f"Scatter plot: {x} vs {y}")
                 return fig
         case "heatmap":
-            MAX_VARS = 10
             corr = df.corr(numeric_only=True)
-            num_vars = corr.shape[0]
-            figs = []
-            if num_vars > MAX_VARS:
-                # Divide as variáveis em grupos de até MAX_VARS (por variância)
-                variancias = df.var(numeric_only=True).sort_values(ascending=False)
-                var_names = list(variancias.index)
-                for i in range(0, len(var_names), MAX_VARS):
-                    group = var_names[i:i+MAX_VARS]
-                    corr_group = corr.loc[group, group]
-                    fig, ax = plt.subplots()
-                    sns.heatmap(corr_group, annot=True, cmap="coolwarm", ax=ax)
-                    ax.set_title(f"Heatmap de Correlação ({i+1}-{i+len(group)})\n⚠️ Por limitações visuais, o máximo de variáveis por imagem é {MAX_VARS}.")
-                    figs.append(fig)
-                return figs if len(figs) > 1 else figs[0]
-            else:
-                fig, ax = plt.subplots()
-                sns.heatmap(corr, annot=True, cmap="coolwarm", ax=ax)
-                ax.set_title("Heatmap de Correlação")
-                return fig
+            fig, ax = plt.subplots(figsize=(max(8, 0.5 * len(corr)), max(6, 0.5 * len(corr))))
+            # Heatmap sem valores numéricos (apenas cores)
+            sns.heatmap(
+                corr,
+                annot=False,
+                cmap="coolwarm",
+                ax=ax,
+                cbar=True,
+                square=True,
+                linewidths=0.5,
+                xticklabels=True,
+                yticklabels=True
+            )
+            # Ajusta os rótulos para evitar sobreposição
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=8)
+            ax.set_yticklabels(ax.get_yticklabels(), rotation=0, fontsize=8)
+            fig.tight_layout()
+            ax.set_title("Heatmap de Correlação (cores apenas, sem valores)")
+            return fig
         case "bar":
             fig, ax = plt.subplots()
             cat_cols = df.select_dtypes(include=['object', 'category']).columns
