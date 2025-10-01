@@ -1,6 +1,11 @@
+
+import os
 from openai import OpenAI
+from dotenv import load_dotenv
 
 def query_llm(question: str, analysis):
+    load_dotenv()
+    api_key = os.getenv("OPENROUTER_API_KEY")
     prompt = (
         f"Dados analisados: {analysis}\n"
         f"Pergunta: {question}\n"
@@ -26,7 +31,7 @@ def query_llm(question: str, analysis):
     )
     client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
-        api_key="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",
+        api_key=api_key,
     )
 
     completion = client.chat.completions.create(
