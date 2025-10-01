@@ -2,10 +2,18 @@ import os
 import streamlit as st
 from eda_agent.eda_agent import EDAAgent
 from eda_agent.memory import AgentMemory
-from eda_agent.figs import fig_to_base64
 import pandas as pd
-from matplotlib.figure import Figure
 from dotenv import load_dotenv
+
+from matplotlib.figure import Figure
+import io
+
+# Função utilitária para exibir Figure do matplotlib no Streamlit
+def show_figure(fig, width=250):
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches="tight")
+    buf.seek(0)
+    st.image(buf, width=width)
 
 # Carrega variáveis de ambiente
 load_dotenv()
@@ -33,13 +41,14 @@ if "messages" not in st.session_state:
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-        figs_b64 = message.get("fig", None)
-        if figs_b64 is not None:
-            if isinstance(figs_b64, list):
-                for img_b64 in figs_b64:
-                    st.image(img_b64, width=250)
-            elif isinstance(figs_b64, str):
-                st.image(figs_b64, width=250)
+        figs = message.get("fig", None)
+        if figs is not None:
+            if isinstance(figs, list):
+                for fig in figs:
+                    if isinstance(fig, Figure):
+                        show_figure(fig, width=250)
+            elif isinstance(figs, Figure):
+                show_figure(figs, width=250)
 
 # Entrada do usuário (CSV ou texto)
 chat_value = st.chat_input("Digite sua mensagem", accept_file=True, file_type=["csv"], disabled=st.session_state.messages[-1]["role"] != "assistant")
@@ -74,16 +83,16 @@ if chat_value:
         # Exibe e adiciona a resposta real
         with st.chat_message("assistant"):
             st.markdown(response)
-            figs_b64 = None
+            figs_to_store = None
             if fig is not None:
                 if isinstance(fig, list):
-                    figs_b64 = [fig_to_base64(f) for f in fig if isinstance(f, Figure)]
-                    for img_b64 in figs_b64:
-                        st.image(img_b64, width=400)
+                    figs_to_store = [f for f in fig if isinstance(f, Figure)]
+                    for f in figs_to_store:
+                        show_figure(f, width=400)
                 elif isinstance(fig, Figure):
-                    figs_b64 = fig_to_base64(fig)
-                    st.image(figs_b64, width=400)
-        msg = {"role": "assistant", "content": response}
-        if fig is not None:
-            msg["fig"] = figs_b64
-        st.session_state.messages.append(msg)
+                    figs_to_store = fig
+                    show_figure(figs_to_store, width=400)
+            msg = {"role": "assistant", "content": response}
+            if fig is not None:
+                msg["fig"] = figs_to_store
+            st.session_state.messages.append(msg)
