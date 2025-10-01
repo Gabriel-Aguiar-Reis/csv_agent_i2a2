@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 def query_llm(question: str, analysis):
     load_dotenv()
-    api_key = os.getenv("OPENROUTER_API_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
     prompt = (
         f"Dados analisados: {analysis}\n"
         f"Pergunta: {question}\n"
