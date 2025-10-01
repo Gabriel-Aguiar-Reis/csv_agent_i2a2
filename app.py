@@ -1,10 +1,16 @@
+import os
 import streamlit as st
 from eda_agent.eda_agent import EDAAgent
 from eda_agent.memory import AgentMemory
 from eda_agent.figs import fig_to_base64
 import pandas as pd
 from matplotlib.figure import Figure
+from dotenv import load_dotenv
 
+# Carrega variáveis de ambiente
+load_dotenv()
+
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 st.set_page_config(page_title="Agente EDA CSV", layout="wide")
 st.title("Agente EDA para CSV - Chat")
@@ -13,7 +19,7 @@ st.title("Agente EDA para CSV - Chat")
 if "memory" not in st.session_state:
     st.session_state.memory = AgentMemory()
 if "agent" not in st.session_state:
-    st.session_state.agent = EDAAgent(st.session_state.memory)
+    st.session_state.agent = EDAAgent(st.session_state.memory, api_key=OPENROUTER_API_KEY)
 if "df" not in st.session_state:
     st.session_state.df = None
 

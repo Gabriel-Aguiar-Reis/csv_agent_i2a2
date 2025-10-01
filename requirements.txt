@@ -5,4 +5,4 @@ seaborn
 langchain_openai
 openai
 watchdog
-dotenv
+python-dotenv

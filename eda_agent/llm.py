@@ -1,11 +1,6 @@
-
-import os
 from openai import OpenAI
-from dotenv import load_dotenv
 
-def query_llm(question: str, analysis):
-    load_dotenv()
-    api_key = os.getenv("OPENAI_API_KEY")
+def query_llm(question: str, analysis, api_key: str | None) -> str:
     prompt = (
         f"Dados analisados: {analysis}\n"
         f"Pergunta: {question}\n"
@@ -44,4 +39,4 @@ def query_llm(question: str, analysis):
             }
         ]
     )
-    return completion.choices[0].message.content
+    return completion.choices[0].message.content or "Erro ao obter resposta do LLM."
